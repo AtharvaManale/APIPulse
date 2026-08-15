@@ -144,7 +144,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.pay
+.apipulse
 
 # Spyder project settings
 .spyderproject
