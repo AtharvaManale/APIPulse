@@ -3,7 +3,7 @@ from datetime import datetime
 
 from db.database import Base
 from sqlalchemy import String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 class Users(Base):
     __tablename__ = "registered_users"
@@ -35,3 +35,9 @@ class Users(Base):
         DateTime, 
         default=datetime.utcnow
     )
+
+apis = Relationship(
+    "API",
+    back_populates="user",
+    cascade="all, delete-orphan"
+)

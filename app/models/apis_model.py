@@ -3,7 +3,7 @@ from datetime import datetime
 
 from db.database import Base
 from sqlalchemy import String, Integer, DateTime, Boolean, JSON, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 class API(Base):
     __tablename__ = "registered_apis"
@@ -69,3 +69,15 @@ class API(Base):
         DateTime, 
         default=datetime.utcnow
     )
+
+user = Relationship(
+    "Users",
+    back_populates="apis",
+    cascade="all, delete-orphan"
+)
+
+logs = Relationship(
+    "MonitoredLogs",
+    back_populates="api",
+    cascade="all, delete-orphan"
+)
