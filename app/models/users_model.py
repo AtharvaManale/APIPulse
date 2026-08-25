@@ -2,14 +2,14 @@ import uuid
 from datetime import datetime
 
 from db.database import Base
-from sqlalchemy import String, Integer, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, Relationship
+from sqlalchemy import String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
 
 class Users(Base):
     __tablename__ = "registered_users"
 
     id : Mapped[str] = mapped_column(
-        String(255), primary_key=True, default=lambda: str(uuid.uuid4)
+        String(50), primary_key=True, default=lambda: str(uuid.uuid4)
     )
 
     username : Mapped[str] = mapped_column(
