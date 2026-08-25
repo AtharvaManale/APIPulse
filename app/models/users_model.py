@@ -9,21 +9,29 @@ class Users(Base):
     __tablename__ = "registered_users"
 
     id : Mapped[str] = mapped_column(
-        String(50), primary_key=True, default=lambda: str(uuid.uuid4)
+        String(50), 
+        primary_key=True, 
+        default=lambda: str(uuid.uuid4)
     )
 
     username : Mapped[str] = mapped_column(
-        String(50), nullable=False, unique=True
+        String(50), 
+        nullable=False, 
+        unique=True
     )
 
     email_id : Mapped[str] = mapped_column(
-        String(200), nullable=False, unique=True
+        String(200), 
+        nullable=False, 
+        unique=True
     )
 
     password : Mapped[str] = mapped_column(
-        String(255), nullable=False
+        String(255), 
+        nullable=False
     )
 
     created_at : Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow
+        DateTime, 
+        default=datetime.utcnow
     )
