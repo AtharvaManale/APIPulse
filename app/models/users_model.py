@@ -36,8 +36,8 @@ class Users(Base):
         default=datetime.utcnow
     )
 
-apis = Relationship(
-    "API",
-    back_populates="user",
-    cascade="all, delete-orphan"
-)
+    apis = Relationship(
+        "API",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )

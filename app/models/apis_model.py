@@ -70,14 +70,20 @@ class API(Base):
         default=datetime.utcnow
     )
 
-user = Relationship(
-    "Users",
-    back_populates="apis",
-    cascade="all, delete-orphan"
-)
+    user = Relationship(
+        "Users",
+        back_populates="apis",
+        cascade="all, delete-orphan"
+    )
 
-logs = Relationship(
-    "MonitoredLogs",
-    back_populates="api",
-    cascade="all, delete-orphan"
-)
+    logs = Relationship(
+        "MonitoredLogs",
+        back_populates="apis",
+        cascade="all, delete-orphan"
+    )
+
+    alert = Relationship(
+        "Alerts",
+        back_populates="apis",
+        cascade="all, delete-orphan"
+    )

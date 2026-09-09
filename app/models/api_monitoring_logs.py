@@ -2,7 +2,7 @@ from datetime import datetime
 
 from db.database import Base
 from sqlalchemy import String, BigInteger, Integer, DateTime, Boolean, ForeignKey, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 class MonitoredLogs(Base):
     __tablename__ = "monitored_logs"
@@ -54,4 +54,10 @@ class MonitoredLogs(Base):
         DateTime,
         default=datetime.utcnow,
         nullable=False
+    )
+
+    apis = Relationship(
+        "API",
+        back_populates="logs",
+        cascade="all, delete-orphan"
     )
