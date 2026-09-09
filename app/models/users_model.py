@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from db.database import Base
+from app.db.database import Base
 from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
@@ -11,7 +11,7 @@ class Users(Base):
     id : Mapped[str] = mapped_column(
         String(50), 
         primary_key=True, 
-        default=lambda: str(uuid.uuid4)
+        default=lambda: str(uuid.uuid4())
     )
 
     username : Mapped[str] = mapped_column(

@@ -1,11 +1,15 @@
 from datetime import datetime
 
-from db.database import Base
-from sqlalchemy import String, BigInteger, Integer, DateTime, Boolean, ForeignKey, Text
+from app.db.database import Base
+from sqlalchemy import String, BigInteger, Integer, DateTime, Boolean, ForeignKey, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 class MonitoredLogs(Base):
     __tablename__ = "monitored_logs"
+    __table_args__ = (
+        Index("ix_monitored_logs_api_id_checked_at", "api_id", "checked_at"),
+    )
+
 
     id: Mapped[int] = mapped_column(
         BigInteger, primary_key=True, autoincrement=True
@@ -56,8 +60,7 @@ class MonitoredLogs(Base):
         nullable=False
     )
 
-    apis = Relationship(
+    api = Relationship(
         "API",
-        back_populates="logs",
-        cascade="all, delete-orphan"
+        back_populates="logs"
     )

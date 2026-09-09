@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from db.database import Base
+from app.db.database import Base
 from sqlalchemy import String, Integer, DateTime, Boolean, JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
@@ -11,7 +11,7 @@ class API(Base):
     id: Mapped[str] = mapped_column(
         String(50), 
         primary_key=True, 
-        default=lambda: str(uuid.uuid4)
+        default=lambda: str(uuid.uuid4())
     )
 
     user_id: Mapped[str] = mapped_column(
@@ -73,17 +73,16 @@ class API(Base):
     user = Relationship(
         "Users",
         back_populates="apis",
-        cascade="all, delete-orphan"
     )
 
     logs = Relationship(
         "MonitoredLogs",
-        back_populates="apis",
+        back_populates="api",
         cascade="all, delete-orphan"
     )
 
-    alert = Relationship(
+    alerts = Relationship(
         "Alerts",
-        back_populates="apis",
+        back_populates="api",
         cascade="all, delete-orphan"
     )

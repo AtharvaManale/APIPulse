@@ -1,11 +1,14 @@
-from db.database import Base
-from sqlalchemy import String, Integer, DateTime,ForeignKey, Text, Boolean
+from app.db.database import Base
+from sqlalchemy import String, Integer, DateTime, ForeignKey, Text, Boolean, Index
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 from datetime import datetime
 
 class Alerts(Base):
     __tablename__ = 'alert_logs'
+    __table_args__ = (
+        Index("ix_alert_logs_api_id_resolved", "api_id", "resolved"),
+    )
 
     id: Mapped[int] = mapped_column(
         Integer, 
@@ -45,8 +48,7 @@ class Alerts(Base):
         nullable=True
     )
 
-    apis = Relationship(
+    api = Relationship(
         "API",
-        back_populates="alert",
-        cascade="all, delete-orphan"
+        back_populates="alerts"
     )
