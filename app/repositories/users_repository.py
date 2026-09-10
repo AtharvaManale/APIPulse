@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from app.models.users_model import Users
-import email
 
 class UsersRepository():
 
@@ -13,5 +12,5 @@ class UsersRepository():
     def get_user_by_username(db: Session, username: str):
         return (db.query(Users).filter(Users.username == username).first())
 
-    def get_user_by_email(db: Session, email_id: email):
+    def get_user_by_email(db: Session, email_id: str):
             return (db.query(Users).filter(Users.email_id == email_id).first())

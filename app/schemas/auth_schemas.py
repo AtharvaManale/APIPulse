@@ -1,10 +1,9 @@
 from pydantic import BaseModel
-import email
 
 class RegistrationSchema(BaseModel):
     username: str
     password: str
-    email_id: email
+    email_id: str
 
 class LoginSchema(BaseModel):
     username: str
