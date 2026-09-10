@@ -17,7 +17,8 @@ def signup(request: RegistrationSchema, db: Session = Depends(get_db)):
                                     "user_id": user.id,
                                     "username": user.username,
                                     "email_id": user.email_id,
-                                    "access_token": access_token}, status_code=status.HTTP_201_CREATED)
+                                    "access_token": access_token,
+                                    "token_type": "bearer"}, status_code=status.HTTP_201_CREATED)
 
     except AuthException as a:
         raise HTTPException(
@@ -38,7 +39,8 @@ def login(request: LoginSchema, db: Session = Depends(get_db)):
         access_token = AuthService.login_user(db, request)
 
         return JSONResponse(content={"message": "User is Authenticated",
-                                    "access_token": access_token}, status_code=status.HTTP_200_OK)
+                                    "access_token": access_token,
+                                    "token_type": "bearer"}, status_code=status.HTTP_200_OK)
 
     except AuthException as a:
         raise HTTPException(
