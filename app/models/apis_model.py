@@ -2,11 +2,19 @@ import uuid
 from datetime import datetime
 
 from app.db.database import Base
-from sqlalchemy import String, Integer, DateTime, Boolean, JSON, ForeignKey
+from sqlalchemy import String, Integer, DateTime, Boolean, JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 class API(Base):
     __tablename__ = "registered_apis"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "url",
+            "url_method",
+            name = "unique_url_url_method" 
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         String(50), 
@@ -27,7 +35,7 @@ class API(Base):
     )
 
     url: Mapped[str] = mapped_column(
-        String(2048), 
+        String(500), 
         nullable=False
     )
 
@@ -61,8 +69,8 @@ class API(Base):
 
     is_active: Mapped[bool] = mapped_column(
         Boolean, 
-        default=True,
-          nullable=False
+        default=False,
+        nullable=False
     )
 
     created_at : Mapped[datetime] = mapped_column(

@@ -28,6 +28,7 @@ class UserNotFoundException(AuthException):
         super().__init__(
             "No Such User Exists."
         )
+        
 class UserNotAuthenticatedException(AuthException):
     status_code=401
     def __init__(self):
