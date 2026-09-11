@@ -10,20 +10,28 @@ from app.exceptions.api_exceptions import (UserNotAuthorizedException,
 class APIServices:
 
     @staticmethod
-    def api_info(db: Session, request: ApiFetch, user: Users):
+    def api_info(db: Session, request: ApiFetch, user_id: str) -> API:
 
         api = ApiRepository.get_api_by_id(db, api_id = request.id)
 
         if not api:
             raise APINotFoundException()
 
-        if api.user_id == user.id:
+        if api.user_id == user_id:
             raise UserNotAuthorizedException()
 
         return api
 
     @staticmethod
-    def get_all_apis(db: Session, request: ApiInput, user: Users):
+    def get_all_apis(db: Session, user_id: str):
+
+        apis = ApiRepository.get_apis_of_user(db, user_id)
+
+        return apis
+
+        
+    @staticmethod
+    def register_api(db: Session, request: ApiInput, user_id: str) -> API:
 
         api = ApiRepository.get_api_by_url_url_method(db, request.url, request.url_method)
 
@@ -31,7 +39,7 @@ class APIServices:
             raise ExistingEndpointException()
 
         new_api = API(
-            user_id = user.id,
+            user_id = user_id,
             api_name = request.api_name,
             url = request.url,
             url_method = request.url_method,
