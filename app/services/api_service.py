@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.apis_model import API
 from app.models.users_model import Users
 from app.repositories.apis_repository import ApiRepository
-from app.schemas.api_schemas import ApiFetch, ApiInput
+from app.schemas.api_schemas import ApiInput, APIUpdate
 from app.exceptions.api_exceptions import (UserNotAuthorizedException,
                                            APINotFoundException, 
                                            ExistingEndpointException)
@@ -10,14 +10,14 @@ from app.exceptions.api_exceptions import (UserNotAuthorizedException,
 class APIServices:
 
     @staticmethod
-    def api_info(db: Session, request: ApiFetch, user_id: str) -> API:
+    def api_info(db: Session, id: str, user_id: str) -> API:
 
-        api = ApiRepository.get_api_by_id(db, api_id = request.id)
+        api = ApiRepository.get_api_by_id(db, api_id = id)
 
         if not api:
             raise APINotFoundException()
 
-        if api.user_id == user_id:
+        if api.user_id != user_id:
             raise UserNotAuthorizedException()
 
         return api
@@ -29,7 +29,6 @@ class APIServices:
 
         return apis
 
-        
     @staticmethod
     def register_api(db: Session, request: ApiInput, user_id: str) -> API:
 
@@ -55,6 +54,55 @@ class APIServices:
             db.refresh(new_api)
 
             return new_api
+
+        except Exception:
+            db.rollback()
+            raise
+
+    @staticmethod
+    def update_api_endpoint(db: Session, request: APIUpdate, user_id: str, api_id: str):
+        api = ApiRepository.get_api_by_id(db, api_id)
+
+        if not api:
+            raise APINotFoundException()
+        
+        if api.user_id != user_id:
+            raise UserNotAuthorizedException()
+
+        other_api = ApiRepository.get_api_by_url_url_method(db, request.url, request.url_method)
+
+        if other_api:
+            raise ExistingEndpointException()
+
+        updates = request.model_dump(exclude_unset=True)
+
+        for field, value in updates.items():
+            setattr(api, field, value)
+
+        try:
+            db.commit()
+            db.refresh(api)
+
+            return api
+        
+        except Exception:
+            db.rollback()
+            raise
+
+    @staticmethod
+    def delete_api(db: Session, api_id: str, user_id: str):
+
+        api = ApiRepository.get_api_by_id(db, api_id = api_id)
+        
+        if not api:
+            raise APINotFoundException()
+        
+        if api.user_id != user_id:
+            raise UserNotAuthorizedException()
+
+        try:
+            ApiRepository.delete_endpoint(db, api)
+            db.commit()
 
         except Exception:
             db.rollback()
