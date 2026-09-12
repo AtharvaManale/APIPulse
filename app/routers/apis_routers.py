@@ -23,7 +23,7 @@ def get_api_by_id(id: str, user: Users = Depends(get_current_user), db: Session 
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
@@ -44,7 +44,7 @@ def get_all_apis_of_user(user: Users = Depends(get_current_user), db: Session=De
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
@@ -65,7 +65,7 @@ def regiester_api(request: ApiInput, user: Users = Depends(get_current_user), db
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
@@ -86,7 +86,7 @@ def update_api_endpoint(id: str, request: APIUpdate, db: Session = Depends(get_d
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
@@ -107,7 +107,7 @@ def delete_api_endpoint(id: str, db: Session = Depends(get_db), user: Users = De
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."

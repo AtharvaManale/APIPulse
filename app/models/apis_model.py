@@ -5,7 +5,12 @@ from app.db.database import Base
 from sqlalchemy import String, Integer, DateTime, Boolean, JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
+from app.models.users_model import Users  # noqa: F401
+from app.models.monitored_logs_model import MonitoredLogs  # noqa: F401
+from app.models.alerts_model import Alerts  # noqa: F401
+
 class API(Base):
+
     __tablename__ = "registered_apis"
 
     __table_args__ = (

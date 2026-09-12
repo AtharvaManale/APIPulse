@@ -32,7 +32,7 @@ class AuthService:
             db.commit()
             db.refresh(new_user)
 
-            access_token = create_access_token(user_id=user.id)
+            access_token = create_access_token(user_id=new_user.id)
 
             return new_user, access_token
 

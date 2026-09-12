@@ -28,6 +28,7 @@ def create_access_token(user_id: str):
 def decode_access_token(token: str):
     return jwt.decode(
         token,
-        settings.jwt_secret_key,
-        algorithm = settings.jwt_algorithm
+        key = settings.jwt_secret_key,
+        algorithms = [settings.jwt_algorithm]
     )
+

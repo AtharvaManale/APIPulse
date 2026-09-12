@@ -3,7 +3,7 @@ import time
 import httpx
 
 from sqlalchemy.orm import Session
-from app.models.api_monitoring_logs import MonitoredLogs
+from app.models.monitored_logs_model import MonitoredLogs
 from app.models.apis_model import API
 from app.repositories.logs_repository import LogsRepository
 from app.repositories.apis_repository import ApiRepository

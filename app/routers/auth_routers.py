@@ -25,12 +25,13 @@ def signup(request: RegistrationSchema, db: Session = Depends(get_db)):
             status_code=a.status_code,
             detail=a.message
         )
-    
-    except Exception as e:
+
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error, try later."
         )
+
 
 @auth.post('/login')
 def login(request: LoginSchema, db: Session = Depends(get_db)):
@@ -48,7 +49,7 @@ def login(request: LoginSchema, db: Session = Depends(get_db)):
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error, try later."

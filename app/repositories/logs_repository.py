@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.api_monitoring_logs import MonitoredLogs
+from app.models.monitored_logs_model import MonitoredLogs
 
 class LogsRepository:
 

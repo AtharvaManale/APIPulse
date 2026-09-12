@@ -24,7 +24,7 @@ def check_api(id: str, db: Session = Depends(get_db), user: Users = Depends(get_
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
@@ -44,7 +44,7 @@ def get_logs(id: str, db: Session = Depends(get_db), user: Users = Depends(get_c
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
@@ -64,7 +64,7 @@ def get_last_log(id: str, db: Session = Depends(get_db), user: Users = Depends(g
             detail=a.message
         )
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=500,
             detail="Internal Server Error."
