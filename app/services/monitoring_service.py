@@ -67,7 +67,7 @@ class MonitoringService:
 
             end_time = time.perf_counter()
 
-            response_time_ms = (start_time - end_time)* 1000
+            response_time_ms = int((end_time - start_time) * 1000)
 
             is_success = (api.expected_status_code == response.status_code)
 
@@ -84,32 +84,32 @@ class MonitoringService:
 
         except httpx.TimeoutException:
             end_time = time.perf_counter()
-            response_time_ms = (start_time - end_time)* 1000
+            response_time_ms = int((end_time - start_time) * 1000)
 
             log = MonitoredLogs(
                 api_id = api.id,
                 checked_at = checked_at,
-                status_code = response.status_code,
+                status_code = None,
                 latency_ms = response_time_ms,
                 is_success = False,
                 error_type = "Timeout Error",
                 error_message = "API timeout error",
-                response_size = len(response.content)
+                response_size = 0
             )
 
         except httpx.RequestError as e:
             end_time = time.perf_counter()
-            response_time_ms = (start_time - end_time)* 1000
+            response_time_ms = int((end_time - start_time) * 1000)
 
             log = MonitoredLogs(
                 api_id = api.id,
                 checked_at = checked_at,
-                status_code = response.status_code,
+                status_code = None,
                 latency_ms = response_time_ms,
                 is_success = False,
                 error_type = "Request Error",
                 error_message = str(e),
-                response_size = len(response.content)
+                response_size = 0
             )
 
         LogsRepository.add_log(db, log)
