@@ -9,27 +9,6 @@ from app.schemas.api_schemas import APIResponse, ApiInput, APIUpdate
 
 apis = APIRouter(prefix="/api")
 
-@apis.get('/{id}', response_model=APIResponse, status_code=status.HTTP_200_OK)
-def get_api_by_id(id: str, user: Users = Depends(get_current_user), db: Session = Depends(get_db)):
-
-    try:
-        api = APIServices.api_info(db, id, user.id)
-
-        return api
-
-    except APIException as a:
-        raise HTTPException(
-            status_code=a.status_code,
-            detail=a.message
-        )
-
-    except Exception:
-        raise HTTPException(
-            status_code=500,
-            detail="Internal Server Error."
-        )
-
-
 @apis.get("/all", response_model=list[APIResponse], status_code=status.HTTP_200_OK)
 def get_all_apis_of_user(user: Users = Depends(get_current_user), db: Session=Depends(get_db)):
 
@@ -38,6 +17,27 @@ def get_all_apis_of_user(user: Users = Depends(get_current_user), db: Session=De
 
         return apis
     
+    except APIException as a:
+        raise HTTPException(
+            status_code=a.status_code,
+            detail=a.message
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal Server Error. {str(e)}"
+        )
+
+
+@apis.get('/{id}', response_model=APIResponse, status_code=status.HTTP_200_OK)
+def get_api_by_id(id: str, user: Users = Depends(get_current_user), db: Session = Depends(get_db)):
+
+    try:
+        api = APIServices.api_info(db, id, user.id)
+
+        return api
+
     except APIException as a:
         raise HTTPException(
             status_code=a.status_code,

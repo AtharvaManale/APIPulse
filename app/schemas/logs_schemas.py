@@ -3,9 +3,8 @@ from datetime import datetime
 
 
 class LogResponseSchema(BaseModel):
-    url: str
-    url_method: str
-    check_at: datetime
+    api_id: str
+    checked_at: datetime
     status_code: int
     latency_ms: int
     is_success: bool

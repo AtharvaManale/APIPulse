@@ -32,13 +32,13 @@ class UserNotFoundException(AuthException):
 class UserNotAuthenticatedException(AuthException):
     status_code=401
     def __init__(self):
-            super().__init__(
-                "Invalid Credentials. Try Again."
-            )
+        super().__init__(
+            "Invalid Credentials. Try Again."
+        )
 
 class InvalidTokenException(AuthException):
     status_code=401
     def __init__(self):
-                super().__init__(
-                    "Invalid Auth Bearer Token."
-            )
+        super().__init__(
+            "Invalid Auth Bearer Token."
+    )

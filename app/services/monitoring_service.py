@@ -42,7 +42,7 @@ class MonitoringService:
         return recent_log
 
     @staticmethod
-    async def monitor_api_endpoint(db: Session, api_id: str, user_id: str):
+    def monitor_api_endpoint(db: Session, api_id: str, user_id: str):
         api = ApiRepository.get_api_by_id(db, api_id)
         
         if not api:
@@ -115,3 +115,5 @@ class MonitoringService:
         LogsRepository.add_log(db, log)
         db.commit()
         db.refresh(log)
+
+        return log

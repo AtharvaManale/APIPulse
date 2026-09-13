@@ -24,6 +24,15 @@ class ExistingEndpointException(APIException):
     status_code = 409
 
     def __init__(self):
-        super.__init__(
+        super().__init__(
             "This API endpoint is already registered."
+        )
+
+
+class NoAPIRegisteredException(APIException):
+    status_code = 204
+
+    def __init__(self):
+        super().__init__(
+            "No API registered by the user."
         )

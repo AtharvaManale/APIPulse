@@ -10,7 +10,7 @@ from app.exceptions.api_exceptions import APIException
 
 monitoring = APIRouter(prefix='/check')
 
-@monitoring.post('/{id}', status_code=status.HTTP_201_CREATED, response_model=LogResponseSchema)
+@monitoring.get('/{id}', status_code=status.HTTP_201_CREATED, response_model=LogResponseSchema)
 def check_api(id: str, db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
 
     try:
@@ -50,7 +50,7 @@ def get_logs(id: str, db: Session = Depends(get_db), user: Users = Depends(get_c
             detail="Internal Server Error."
         )
 
-@monitoring.get('/{id}/recent', status_code=status.HTTP_200_OK, response_model=LogResponseSchema)
+@monitoring.get('/{id}/recent_log', status_code=status.HTTP_200_OK, response_model=LogResponseSchema)
 def get_last_log(id: str, db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
 
     try:

@@ -5,7 +5,8 @@ from app.repositories.apis_repository import ApiRepository
 from app.schemas.api_schemas import ApiInput, APIUpdate
 from app.exceptions.api_exceptions import (UserNotAuthorizedException,
                                            APINotFoundException, 
-                                           ExistingEndpointException)
+                                           ExistingEndpointException,
+                                           NoAPIRegisteredException)
 
 class APIServices:
 
@@ -27,6 +28,9 @@ class APIServices:
 
         apis = ApiRepository.get_apis_of_user(db, user_id)
 
+        if len(apis) == 0:
+            raise NoAPIRegisteredException()
+        
         return apis
 
     @staticmethod
@@ -43,7 +47,6 @@ class APIServices:
             url = request.url,
             url_method = request.url_method,
             url_headers = request.url_headers,
-            time_interval = request.time_interval,
             timeout = request.timeout,
             expected_status_code = request.expected_status_code
         )

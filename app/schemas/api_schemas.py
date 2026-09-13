@@ -4,12 +4,12 @@ class ApiInput(BaseModel):
     api_name: str
     url: str
     url_method: str
-    url_headers: dict
-    time_interval: int
+    url_headers: dict | None = None
     timeout: int
     expected_status_code: int
 
 class APIResponse(BaseModel):
+    id : str
     api_name: str
     url: str
     url_method: str
@@ -26,7 +26,6 @@ class APIUpdate(BaseModel):
     url: str | None = None
     url_method: str | None = None
     url_headers: dict | None = None
-    time_interval: int | None = None
     timeout: int | None = None
     expected_status_code: int | None = None
     is_active: bool | None = None

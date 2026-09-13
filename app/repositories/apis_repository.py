@@ -8,7 +8,7 @@ class ApiRepository:
         return (db.query(API).filter(API.id == api_id).first())
 
     def get_apis_of_user(db:Session, user_id: str):
-        return [db.query(API).filter(API.user_id == user_id).all()]
+        return db.query(API).filter(API.user_id == user_id).all()
 
     def get_api_by_url(db: Session, api_url: str) -> API:
         return (db.query(API).filter(API.url == api_url).first())
