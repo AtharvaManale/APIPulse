@@ -39,6 +39,8 @@ class AuthService:
         except Exception:
             db.rollback()
             raise
+        finally:
+            db.close()
 
     @staticmethod
     def login_user(db: Session, request: LoginSchema):

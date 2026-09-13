@@ -23,6 +23,7 @@ class APIServices:
 
         return api
 
+
     @staticmethod
     def get_all_apis(db: Session, user_id: str):
 
@@ -32,6 +33,7 @@ class APIServices:
             raise NoAPIRegisteredException()
         
         return apis
+
 
     @staticmethod
     def register_api(db: Session, request: ApiInput, user_id: str) -> API:
@@ -47,8 +49,10 @@ class APIServices:
             url = request.url,
             url_method = request.url_method,
             url_headers = request.url_headers,
+            time_interval = request.time_interval,
             timeout = request.timeout,
-            expected_status_code = request.expected_status_code
+            expected_status_code = request.expected_status_code,
+            is_active = request.is_active
         )
 
         try:
@@ -61,6 +65,10 @@ class APIServices:
         except Exception:
             db.rollback()
             raise
+
+        finally:
+            db.close()
+
 
     @staticmethod
     def update_api_endpoint(db: Session, request: APIUpdate, user_id: str, api_id: str):
@@ -92,6 +100,10 @@ class APIServices:
             db.rollback()
             raise
 
+        finally:
+            db.close()
+
+
     @staticmethod
     def delete_api(db: Session, api_id: str, user_id: str):
 
@@ -110,3 +122,6 @@ class APIServices:
         except Exception:
             db.rollback()
             raise
+
+        finally:
+            db.close()

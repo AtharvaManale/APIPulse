@@ -10,6 +10,9 @@ class ApiRepository:
     def get_apis_of_user(db:Session, user_id: str):
         return db.query(API).filter(API.user_id == user_id).all()
 
+    def get_active_apis_by_interval(db: Session, interval: int) -> list[API]:
+        return db.query(API).filter(API.time_interval == interval, API.is_active == True).all()
+
     def get_api_by_url(db: Session, api_url: str) -> API:
         return (db.query(API).filter(API.url == api_url).first())
 
