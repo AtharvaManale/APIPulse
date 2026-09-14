@@ -125,3 +125,28 @@ class APIServices:
 
         finally:
             db.close()
+
+    @staticmethod
+    def toggle_active_status(db: Session, api_id: str, user_id: str, is_active: bool | None = None) -> API:
+        api = ApiRepository.get_api_by_id(db, api_id=api_id)
+
+        if not api:
+            raise APINotFoundException()
+
+        if api.user_id != user_id:
+            raise UserNotAuthorizedException()
+
+        if is_active is None:
+            api.is_active = not api.is_active
+        else:
+            api.is_active = is_active
+
+        try:
+            db.commit()
+            db.refresh(api)
+            return api
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()

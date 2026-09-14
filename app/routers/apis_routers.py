@@ -112,3 +112,28 @@ def delete_api_endpoint(id: str, db: Session = Depends(get_db), user: Users = De
             status_code=500,
             detail="Internal Server Error."
         )
+
+
+@apis.patch('/toggle-active/{id}', response_model=APIResponse, status_code=status.HTTP_200_OK)
+@apis.patch('/{id}/toggle-active', response_model=APIResponse, status_code=status.HTTP_200_OK)
+def toggle_api_status(
+    id: str,
+    is_active: bool | None = None,
+    user: Users = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        api = APIServices.toggle_active_status(db, id, user.id, is_active)
+        return api
+
+    except APIException as a:
+        raise HTTPException(
+            status_code=a.status_code,
+            detail=a.message
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal Server Error. {str(e)}"
+        )
