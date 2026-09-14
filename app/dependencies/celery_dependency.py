@@ -10,7 +10,9 @@ celery.conf.timezone = "UTC"
 
 celery.conf.imports = (
     "app.tasks.monitoring_tasks",
+    "app.tasks.email_tasks",
 )
+
 
 celery.conf.beat_schedule = {
     "monitor-30-second-apis": {

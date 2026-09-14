@@ -9,6 +9,7 @@ from app.repositories.logs_repository import LogsRepository
 from app.repositories.apis_repository import ApiRepository
 from app.exceptions.api_exceptions import (APINotFoundException,
                                            UserNotAuthorizedException)
+from app.services.alerts_service import AlertsService
 
 
 class MonitoringService:
@@ -116,4 +117,5 @@ class MonitoringService:
         db.commit()
         db.refresh(log)
 
+        AlertsService.evaluate_probe(db, api, log)
         return log
