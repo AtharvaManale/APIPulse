@@ -4,6 +4,7 @@ from app.models.monitored_logs_model import MonitoredLogs
 from app.models.alerts_model import Alerts
 from app.repositories.alerts_repository import AlertsRepository
 from app.repositories.users_repository import UsersRepository
+from app.tasks.email_tasks import send_downtime_alert_email
 
 
 class AlertsService:
@@ -45,7 +46,6 @@ class AlertsService:
             try:
                 owner = api.user or UsersRepository.get_user_by_id(db, api.user_id)
                 if owner and owner.email_id:
-                    from app.tasks.email_tasks import send_downtime_alert_email
                     send_downtime_alert_email.delay(
                         to_email=owner.email_id,
                         username=owner.username,
