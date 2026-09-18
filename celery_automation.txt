@@ -132,3 +132,13 @@ Start the Celery Worker (Terminal 1):
 Start the Celery Beat Scheduler (Terminal 2):
   celery -A app.dependencies.celery_dependency beat --loglevel=info
 ================================================================================
+
+Hola Amigos!!
+
+I hope you have got answers for these question:
+why I used Celery,
+Where I used Celery,
+How I used Celery.
+
+
+Graciassss.....
