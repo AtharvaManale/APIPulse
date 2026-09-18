@@ -1,0 +1,134 @@
+================================================================================
+APIPULSE - CELERY AUTOMATION CORE GUIDE
+================================================================================
+
+1. WHAT IS CELERY AND WHY DO WE USE IT?
+--------------------------------------------------------------------------------
+In a standard web server, when a request comes in, the server processes it and
+responds to the client. But health monitoring cannot wait for a user to click a 
+button; it must run automatically in the background around the clock.
+
+If we tried to probe dozens of APIs inside the main FastAPI server process:
+- The server would freeze and slow down for real users.
+- Slow or unresponsive target APIs would block network threads.
+- Scheduling repetitive timers inside a web server is fragile and unreliable.
+
+Celery solves this by decoupling scheduling and heavy network requests from the 
+FastAPI web server. It runs as a separate background process dedicated solely to 
+executing automated monitoring jobs.
+
+
+2. THE THREE MAIN PARTS OF OUR AUTOMATION SYSTEM
+--------------------------------------------------------------------------------
+Our automation pipeline consists of three cooperating parts:
+
+A. CELERY BEAT (The Clock / Scheduler):
+   - Acts as a ticker clock.
+   - It does not test any APIs itself.
+   - Its only job is to look at the clock and trigger scheduled jobs at exact
+     intervals (every 30s, 60s, 120s, and 300s).
+   - When an interval is reached, Beat drops a message into Redis saying:
+     "It is time to check all 60-second APIs."
+
+B. REDIS (The Message Broker / Queue):
+   - An ultra-fast in-memory queue.
+   - Holds tasks published by Celery Beat or FastAPI until a worker is free to
+     pick them up.
+   - Ensures no tasks are lost if a worker is busy.
+
+C. CELERY WORKER (The Muscle / Executor):
+   - The background process that actually does the work.
+   - Pulls tasks from Redis.
+   - Queries MySQL for active APIs matching the interval.
+   - Fires HTTP requests to the target APIs.
+   - Calculates response latency in milliseconds.
+   - Writes logs into MySQL.
+   - Detects outages and sends alert emails via SMTP.
+
+
+3. STEP-BY-STEP: HOW THE AUTOMATION LOOP WORKS
+--------------------------------------------------------------------------------
+Step 1: Beat triggers an interval
+Every 60 seconds (for example), Celery Beat places this task into Redis:
+    app.tasks.monitoring_tasks.monitor_apis_by_interval(interval=60)
+
+Step 2: Worker queries active APIs
+A Celery worker picks up that task and executes:
+    AutomationService.schedule_monitoring_for_interval(60)
+The service queries MySQL for:
+    registered_apis WHERE time_interval = 60 AND is_active = True
+
+Step 3: Worker fans out individual probe tasks
+For each active API found, the worker publishes a separate sub-task to Redis:
+    monitor_api.delay(api_id, user_id)
+This ensures every API check runs independently. If API #1 takes 10 seconds to
+timeout, API #2 and API #3 are still checked immediately without waiting.
+
+Step 4: Probing the target API
+The worker executes an HTTP request to the target API URL using httpx:
+- Measures response time in milliseconds (latency).
+- Captures status code (e.g., 200, 404, 500) and payload size.
+- Checks if the response code matches expected_status_code.
+- Saves the result into the monitored_logs table.
+
+Step 5: Evaluating Downtime (3 Consecutive Failures Rule)
+Right after saving the probe log:
+- The worker looks at the last 3 logs for this API.
+- If all 3 logs failed (is_success = False):
+  1. The API is marked as DOWN.
+  2. Automation is paused: api.is_active is changed to False in the database.
+     Because is_active is now False, Celery Beat will no longer pick up this
+     API in subsequent cycles. This stops infinite error spam.
+  3. A new record is inserted into alert_logs with type = "API_DOWN" and
+     resolved = False (duplicate alerts are suppressed).
+  4. An asynchronous email task is sent to Redis:
+     send_downtime_alert_email.delay(...)
+
+Step 6: Sending the Email Alert with Retries
+Another worker task handles the email:
+- It constructs a clean HTML and plain-text alert with downtime details.
+- It delivers the email to the owner using server.send_message().
+- If the mail server has a network glitch or timeout (smtplib.SMTPException),
+  Celery automatically retries the task after 60 seconds (up to 3 times).
+
+Step 7: Auto-Recovery
+When the user fixes their target API and re-enables automation (via the dashboard
+or PATCH /api/toggle-active/{id}):
+- As soon as a subsequent probe returns is_success = True, the system searches
+  for any unresolved alerts for that API and automatically marks them:
+  resolved = True and sets resolved_at to the current timestamp.
+
+
+4. SUMMARY OF CELERY TASKS IN APIPULSE
+--------------------------------------------------------------------------------
+1. monitor_apis_by_interval(interval: int)
+   - Module: app.tasks.monitoring_tasks
+   - Triggered by: Celery Beat schedule (30s, 60s, 120s, 300s)
+   - Action: Finds active APIs for that interval and dispatches individual checks.
+
+2. monitor_api(api_id: str, user_id: str)
+   - Module: app.tasks.monitoring_tasks
+   - Triggered by: monitor_apis_by_interval (or manual trigger from FastAPI)
+   - Action: Performs HTTP probe, stores log, triggers downtime evaluation.
+
+3. send_downtime_alert_email(...)
+   - Module: app.tasks.email_tasks
+   - Triggered by: AlertsService when 3 consecutive failures occur
+   - Options: bind=True, max_retries=3, default_retry_delay=60
+   - Action: Sends email notification to API owner via SMTP with retry logic.
+
+
+5. HOW TO RUN CELERY (COMMANDS)
+--------------------------------------------------------------------------------
+Prerequisites:
+- Redis must be running: redis-server
+
+Start the Celery Worker (Terminal 1):
+  Windows:
+    celery -A app.dependencies.celery_dependency worker --loglevel=info -P solo
+  Linux / macOS:
+    celery -A app.dependencies.celery_dependency worker --loglevel=info
+
+Start the Celery Beat Scheduler (Terminal 2):
+  celery -A app.dependencies.celery_dependency beat --loglevel=info
+================================================================================
