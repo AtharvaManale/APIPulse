@@ -1,9 +1,10 @@
 from celery import Celery
+from app.core.config import settings
 
 celery = Celery(
     "APIPulse",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
+    broker= settings.redis_url,
+    backend=settings.redis_url
 )
 
 celery.conf.timezone = "UTC"

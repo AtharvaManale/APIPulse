@@ -8,7 +8,7 @@ def monitor_apis_by_interval(interval: int):
 
     return AutomationService.schedule_monitoring_for_interval(interval)
 
-@celery.task(name="app.tasks.monitoring_tasks.monitor_api")
+@celery.task(name="app.tasks.monitoring_tasks.monitor_api", ignore_result=True)
 def monitor_api(api_id: str, user_id: str):
 
     return AutomationService.execute_api_monitor(api_id=api_id, user_id=user_id)
