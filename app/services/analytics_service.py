@@ -38,7 +38,7 @@ class AnalyticsService:
     def _determine_health(latest_log) -> str:
         if not latest_log:
             return "no_data"
-        if not latest_log.is_success or (latest_log.latency_ms is not None and latest_log.latency_ms > 500):
+        if not latest_log.is_success:
             return "down"
         if latest_log.latency_ms is not None and latest_log.latency_ms >= 200:
             return "degraded"

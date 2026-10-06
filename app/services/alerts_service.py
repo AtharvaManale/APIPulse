@@ -26,18 +26,21 @@ class AlertsService:
             if not consecutive_failures:
                 return
 
+            last_error = latest_log.error_message or (f"HTTP {latest_log.status_code}" if latest_log.status_code else "Health check failed")
+
             existing_active_alert = AlertsRepository.get_active_alert(db, api.id)
             if existing_active_alert:
-                return
-
-            last_error = latest_log.error_message or (f"HTTP {latest_log.status_code}" if latest_log.status_code else "Health check failed")
-            new_alert = Alerts(
-                api_id=api.id,
-                type="API_DOWN",
-                message=f"Endpoint failed 3 consecutive health checks. Last error: {last_error}",
-                resolved=False
-            )
-            AlertsRepository.add_alert(db, new_alert)
+                if not api.is_active:
+                    return
+                existing_active_alert.message = f"Endpoint failed again after reactivation. Last error: {last_error}"
+            else:
+                new_alert = Alerts(
+                    api_id=api.id,
+                    type="API_DOWN",
+                    message=f"Endpoint failed 3 consecutive health checks. Last error: {last_error}",
+                    resolved=False
+                )
+                AlertsRepository.add_alert(db, new_alert)
 
             api.is_active = False
             db.commit()
