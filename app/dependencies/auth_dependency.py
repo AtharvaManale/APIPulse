@@ -18,20 +18,22 @@ def get_current_user(db: Session = Depends(get_db), token: str=Depends(oauth2_sc
 
         user_id = payload.get("sub")
 
-        expire = datetime.now(timezone.utc) >= payload.get("expire")
-        
-        if expire:
-            raise InvalidTokenException()
-
         if not user_id:
             raise InvalidTokenException()
 
-    except AuthException as a:
+    except jwt.ExpiredSignatureError as a:
+         raise HTTPException(
+             status_code=a.status_code,
+             detail=a.message
+         )
+    
+    except jwt.InvalidTokenError as a:
             raise HTTPException(
                 status_code=a.status_code,
                 detail=a.message
             )
-    except jwt.InvalidTokenError as a:
+
+    except AuthException as a:
             raise HTTPException(
                 status_code=a.status_code,
                 detail=a.message
