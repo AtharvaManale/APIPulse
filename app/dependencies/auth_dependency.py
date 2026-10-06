@@ -2,6 +2,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import jwt
+from datetime import datetime, timezone
 
 from app.db.session import get_db
 from app.repositories.users_repository import UsersRepository
@@ -16,6 +17,11 @@ def get_current_user(db: Session = Depends(get_db), token: str=Depends(oauth2_sc
         payload = decode_access_token(token)
 
         user_id = payload.get("sub")
+
+        expire = datetime.now(timezone.utc) >= payload.get("expire")
+        
+        if expire:
+            raise InvalidTokenException()
 
         if not user_id:
             raise InvalidTokenException()
