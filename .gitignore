@@ -214,3 +214,6 @@ test
 
 alembic
 alembic.ini
+
+#UI
+frontend_app
