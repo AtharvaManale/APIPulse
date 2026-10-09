@@ -39,3 +39,15 @@ class AlertsRepository:
         for alert in active_alerts:
             alert.resolved = True
             alert.resolved_at = now
+
+    @staticmethod
+    def get_alerts_by_user(db: Session, user_id: str, limit: int = 100) -> list[Alerts]:
+        from app.models.apis_model import API
+        return (
+            db.query(Alerts)
+            .join(API, Alerts.api_id == API.id)
+            .filter(API.user_id == user_id)
+            .order_by(Alerts.created_at.desc())
+            .limit(limit)
+            .all()
+        )
