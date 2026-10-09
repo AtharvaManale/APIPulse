@@ -7,7 +7,7 @@ from app.services.api_service import APIServices
 from app.exceptions.api_exceptions import APIException
 from app.schemas.api_schemas import APIResponse, ApiInput, APIUpdate
 
-apis = APIRouter(prefix="/api")
+apis = APIRouter(prefix="/api", tags=["API CRUD"])
 
 @apis.get("/all", response_model=list[APIResponse], status_code=status.HTTP_200_OK)
 def get_all_apis_of_user(user: Users = Depends(get_current_user), db: Session=Depends(get_db)):
@@ -136,4 +136,4 @@ def toggle_api_status(
         raise HTTPException(
             status_code=500,
             detail=f"Internal Server Error. {str(e)}"
-        )
+        )

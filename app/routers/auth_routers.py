@@ -5,7 +5,7 @@ from app.schemas.auth_schemas import RegistrationSchema, LoginSchema
 from app.db.session import get_db
 from app.exceptions.auth_exceptions import AuthException
 
-auth = APIRouter(prefix="/auth")
+auth = APIRouter(prefix="/auth",tags=["Auth"])
 
 @auth.post('/register')
 def signup(request: RegistrationSchema, db: Session = Depends(get_db)):

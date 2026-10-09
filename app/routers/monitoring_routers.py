@@ -8,7 +8,7 @@ from app.schemas.logs_schemas import LogResponseSchema
 from app.exceptions.api_exceptions import APIException
 
 
-monitoring = APIRouter(prefix='/check')
+monitoring = APIRouter(prefix='/check',tags=["Monitoring"])
 
 @monitoring.get('/{id}', status_code=status.HTTP_201_CREATED, response_model=LogResponseSchema)
 def check_api(id: str, db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
