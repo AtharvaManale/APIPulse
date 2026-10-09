@@ -72,14 +72,28 @@ class MonitoringService:
 
             is_success = (api.expected_status_code == response.status_code)
 
+            if is_success:
+                error_type = None
+                error_message = None
+            else:
+                reason = response.reason_phrase or "Unknown"
+                if 500 <= response.status_code < 600:
+                    error_type = "HTTP 5xx Server Error"
+                elif 400 <= response.status_code < 500:
+                    error_type = "HTTP 4xx Client Error"
+                else:
+                    error_type = "Status Code Mismatch"
+                
+                error_message = f"Expected HTTP {api.expected_status_code}, received HTTP {response.status_code} ({reason})"
+
             log = MonitoredLogs(
                 api_id = api.id,
                 checked_at = checked_at,
                 status_code = response.status_code,
                 latency_ms = response_time_ms,
                 is_success = is_success,
-                error_type = None,
-                error_message = None,
+                error_type = error_type,
+                error_message = error_message,
                 response_size = len(response.content)
             )
 
@@ -94,7 +108,22 @@ class MonitoringService:
                 latency_ms = response_time_ms,
                 is_success = False,
                 error_type = "Timeout Error",
-                error_message = "API timeout error",
+                error_message = f"Request timed out after {api.timeout}s",
+                response_size = 0
+            )
+
+        except httpx.ConnectError as e:
+            end_time = time.perf_counter()
+            response_time_ms = int((end_time - start_time) * 1000)
+
+            log = MonitoredLogs(
+                api_id = api.id,
+                checked_at = checked_at,
+                status_code = None,
+                latency_ms = response_time_ms,
+                is_success = False,
+                error_type = "Connection Error",
+                error_message = f"Connection failed: {str(e)}",
                 response_size = 0
             )
 
@@ -108,8 +137,23 @@ class MonitoringService:
                 status_code = None,
                 latency_ms = response_time_ms,
                 is_success = False,
-                error_type = "Request Error",
-                error_message = str(e),
+                error_type = "Network Error",
+                error_message = f"Request error: {str(e)}",
+                response_size = 0
+            )
+
+        except Exception as e:
+            end_time = time.perf_counter()
+            response_time_ms = int((end_time - start_time) * 1000) if 'start_time' in locals() else 0
+
+            log = MonitoredLogs(
+                api_id = api.id,
+                checked_at = checked_at if 'checked_at' in locals() else datetime.now(),
+                status_code = None,
+                latency_ms = response_time_ms,
+                is_success = False,
+                error_type = "Probe Execution Error",
+                error_message = f"Probe failed: {str(e)}",
                 response_size = 0
             )
 

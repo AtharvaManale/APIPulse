@@ -35,6 +35,8 @@ class AutomationService:
                 "status_code": log.status_code,
                 "latency_ms": log.latency_ms,
                 "is_success": log.is_success,
+                "error_type": log.error_type,
+                "error_message": log.error_message,
                 "checked_at": str(log.checked_at),
             }
         except Exception as e:
