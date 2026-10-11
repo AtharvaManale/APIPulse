@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     smtp_password: str
     emails_from: str
 
+    external_url: str
+    external_url_2: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
